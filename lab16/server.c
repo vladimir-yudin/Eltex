@@ -140,6 +140,16 @@ int server_func(int sockfd){
         if (pid == 0){
             close(sockfd);
             child_func(newsockfd);
+            if(sem_wait(semid) == -1){
+                perror("sem_wait");
+                exit(1);
+            }
+            *nclients -= 1; // уменьшаем счетчик подключившихся клиентов
+            if(sem_post(semid) == -1){
+                perror("sem_post");
+                exit(1);
+            }
+            printf("%d user on-line\n",*nclients);
             exit(0);
         }
         close(newsockfd);
@@ -181,7 +191,10 @@ int child_func(int sockfd){
         printf("%d %c %d = %d\n", a, sign, b, result);
     }
     if (msg_type == FILE_MSG){
-        int fd = open("write.txt", O_CREAT | O_WRONLY | O_TRUNC, 0600);
+        printf("Введите имя файла: ");
+        char buf[SIZE];
+        scanf("%s", buf);
+        int fd = open(buf, O_CREAT | O_WRONLY | O_TRUNC, 0600);
         if (fd == -1){
             perror("open");
             return -1;
@@ -201,18 +214,12 @@ int child_func(int sockfd){
                 perror("write");
                 return -1;
             }
+            if (write(sockfd, &msg, sizeof(msg)) == (ssize_t) -1){
+                perror("write");
+                return -1;
+            }
         }
         close(fd);
-        if(sem_wait(semid) == -1){
-            perror("sem_wait");
-            exit(1);
-        }
-	    *nclients -= 1; // уменьшаем счетчик подключившихся клиентов
-        if(sem_post(semid) == -1){
-            perror("sem_post");
-            exit(1);
-        }
-        printf("%d user on-line\n",*nclients);
     }
     return 0;
 }

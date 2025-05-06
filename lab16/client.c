@@ -93,7 +93,10 @@ int main(int argc, char *argv[])
             break;
         case 2:
             msg.type = FILE_MSG;
-            int fd = open("read.txt", O_RDONLY);
+            printf("Введите имя файла: ");
+            char buf[SIZE];
+            scanf("%s", buf);
+            int fd = open(buf, O_RDONLY);
             if (fd == -1){
                 perror("open");
                 return -1;
@@ -112,6 +115,10 @@ int main(int argc, char *argv[])
                 read(fd, msg.buf, SIZE - 1);
                 if (write(my_sock, &msg, sizeof(msg)) == (ssize_t) -1){
                     perror("write");
+                    return -1;
+                }
+                if (read(my_sock, &msg, sizeof(msg)) == (ssize_t) -1){
+                    perror("read");
                     return -1;
                 }
             }
