@@ -11,7 +11,7 @@
 
 int main() {
     int sockfd;
-    if ((sockfd = socket(AF_INET, SOCK_DGRAM, 0)) == -1){
+    if ((sockfd = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP)) == -1){
         perror("socket");
         exit(1);
     }
