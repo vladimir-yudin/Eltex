@@ -4,9 +4,11 @@
 #include <linux/sched.h>
 #include <linux/uaccess.h>
 #include <linux/slab.h>
+
+#define PROC_NAME "lab2"
+static const int SIZE = 10;
  
 static int len, temp;
-static const int SIZE = 10;
 static char *msg;
  
 static ssize_t read_proc(struct file *filp, char *buf, size_t count, loff_t *offp ) {
@@ -37,7 +39,7 @@ static const struct proc_ops proc_fops = {
 };
  
 static void create_new_proc_entry(void) { //use of void for no arguments is compulsory now
-    proc_create("lab2", 0, NULL, &proc_fops);
+    proc_create(PROC_NAME, 0, NULL, &proc_fops);
     msg = kmalloc(SIZE * sizeof(char), GFP_KERNEL);
 }
 
@@ -47,7 +49,7 @@ static int proc_init (void) {
 }
  
 static void proc_cleanup(void) {
-    remove_proc_entry("lab2", NULL);
+    remove_proc_entry(PROC_NAME, NULL);
     kfree(msg);
 }
  
