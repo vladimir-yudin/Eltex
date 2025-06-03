@@ -10,6 +10,9 @@
 #include <linux/vt_kern.h>
 #include <linux/timer.h>
 
+#define BLINK_DELAY   HZ/5
+#define MAX_LEDS_VALUE  7
+#define RESTORE_LEDS  0xFF
 
 MODULE_DESCRIPTION("Example module illustrating the use of Keyboard LEDs. To change LEDs use `kbledstatus = from 0 to 7`");
 MODULE_LICENSE("GPL");
@@ -17,10 +20,8 @@ MODULE_AUTHOR("Yudin V.");
 struct timer_list my_timer;
 struct tty_driver *my_driver;
 static int _kbledstatus = 0;
-static int kbledstatus = 7; // all LEDs on
+static int kbledstatus = MAX_LEDS_VALUE; // all LEDs on
 module_param(kbledstatus, int, 0600);
-#define BLINK_DELAY   HZ/5
-#define RESTORE_LEDS  0xFF
 /*
  * Function my_timer_func blinks the keyboard LEDs periodically by invoking
  * command KDSETLED of ioctl() on the keyboard driver. To learn more on virtual
@@ -38,6 +39,8 @@ module_param(kbledstatus, int, 0600);
 static void my_timer_func(struct timer_list *ptr)
 {
         int *pstatus = &_kbledstatus;
+        if (kbledstatus < 0) kbledstatus = 0;
+        else if (kbledstatus > MAX_LEDS_VALUE) kbledstatus = MAX_LEDS_VALUE;
         if (*pstatus == kbledstatus)
                 *pstatus = RESTORE_LEDS;
         else
