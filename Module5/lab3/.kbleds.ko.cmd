@@ -1,1 +1,0 @@
-savedcmd_/home/vladimir/Eltex/Module5/lab3/kbleds.ko := ld -r -m elf_x86_64 -z noexecstack --build-id=sha1  -T scripts/module.lds -o /home/vladimir/Eltex/Module5/lab3/kbleds.ko /home/vladimir/Eltex/Module5/lab3/kbleds.o /home/vladimir/Eltex/Module5/lab3/kbleds.mod.o
