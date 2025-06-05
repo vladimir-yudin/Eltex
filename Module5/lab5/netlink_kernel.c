@@ -7,7 +7,7 @@
 
 MODULE_DESCRIPTION("Example module illustrating the use of netlink.");
 MODULE_LICENSE("GPL");
-MODULE_AUTHOR("Yudin V.");
+MODULE_AUTHOR("Yudin V.")
 
 struct sock *nl_sk = NULL;
 

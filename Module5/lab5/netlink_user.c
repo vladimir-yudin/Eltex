@@ -9,7 +9,7 @@
 int main(int argc, char *argv[])
 {
     if (argc < 2){
-        printf("Not enough arguments");
+        printf("Not enough arguments")
         return -1;
     }
     struct sockaddr_nl src_addr, dest_addr;

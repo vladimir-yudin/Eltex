@@ -1,2 +1,2 @@
-#define NETLINK_USER 31
+#define NETLINK_USER 30
 #define MAX_PAYLOAD 1024
