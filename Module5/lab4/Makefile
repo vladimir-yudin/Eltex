@@ -1,17 +1,13 @@
 obj-m += chardev.o
 
-all: make_chardev make_test
-	
-clean: clean_chardev clean_test
-
-make_chardev:
+all:
 	make -C /lib/modules/$(shell uname -r)/build M=$(shell pwd) modules
 
-clean_chardev:
+clean:
 	make -C /lib/modules/$(shell uname -r)/build M=$(shell pwd) clean
 
-make_test:
-	gcc -o netlink_user netlink_user.c
+load: all
+	sudo insmod $(basename $(obj-m)).ko
 
-clean_test:
-	rm netlink_user
+unload: clean
+	sudo rmmod $(basename $(obj-m))

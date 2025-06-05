@@ -2,11 +2,13 @@
 #include <linux/module.h>
 #include <linux/fs.h>
 #include <linux/device.h> 
+#include <linux/string.h>
 #include <linux/uaccess.h>        /* определение функции copy_to_user */
-#include "constants.h"
 
-int init_module(void);
-void cleanup_module(void);
+#define SUCCESS 0
+#define DEVICE_NAME "chardev"   /* Имя устройства, будет отображаться в /proc/devices   */
+#define BUF_LEN 80              /* Максимальная длина сообщения */  
+
 static int device_open(struct inode *, struct file *);
 static int device_release(struct inode *, struct file *);
 static ssize_t device_read(struct file *, char __user*, size_t , loff_t *);
@@ -16,9 +18,9 @@ MODULE_DESCRIPTION("Example module illustrating the use of chardev.");
 MODULE_LICENSE("GPL");
 MODULE_AUTHOR("Yudin V.");
 
-static int Major;               /* Старший номер устройства нашего драйвера */
-static int Device_Open = 0;     /* Устройство открыто? */
-static char msg[BUF_LEN];       /* Здесь будет собираться текст сообщения */
+static int Major;               //Старший номер устройства нашего драйвера
+static int Device_Open = 0;     //Устройство открыто?
+static char msg[BUF_LEN];       //Здесь будет собираться текст сообщения
 static struct class *cls; 
 
 static struct file_operations fops = {
@@ -45,15 +47,27 @@ static int device_release(struct inode *inode, struct file *file){
     return SUCCESS;
 }
 static ssize_t device_read(struct file *filp, char *buffer, size_t length, loff_t *offset){
-    if (copy_to_user(buffer, msg, length) == BUF_LEN) {
+    size_t len = strnlen(msg, BUF_LEN);
+
+    if (*offset >= len)
+        return 0;
+
+    len = min(length, len - *offset);
+
+    if (copy_to_user(buffer, msg + *offset, len))
         return -EFAULT;
-    }
-    return length;
+
+    *offset += len;
+    return len;
 }
 static ssize_t device_write(struct file *filp, const char *buffer, size_t length, loff_t *offset){
-    if (copy_from_user(msg, buffer, length)) {
+    memset(msg, 0, BUF_LEN);
+    
+    if (length > BUF_LEN)
+        length = BUF_LEN;
+    
+    if (copy_from_user(msg, buffer, length))
         return -EFAULT;
-    }
     return length;
 }
 
